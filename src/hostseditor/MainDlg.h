@@ -5,10 +5,6 @@
 
 #pragma once
 
-#include "resource.h"
-#include "AboutDlg.h"
-#include "WndLayout.h"
-
 
 class CMainDlg : public CDialogImpl<CMainDlg>, public CMessageFilter
 {
@@ -29,6 +25,12 @@ public:
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 
 		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+
+        // Modes Name ListBox
+		COMMAND_ID_HANDLER(ID_MODENAMECONTEXTMENU_ADD, OnModeNameAdd)
+		COMMAND_ID_HANDLER(ID_MODENAMECONTEXTMENU_REMOVE, OnModeNameRemove)
+		COMMAND_ID_HANDLER(ID_MODENAMECONTEXTMENU_RENAME, OnModeNameRename)
+		COMMAND_ID_HANDLER(ID_MODENAMECONTEXTMENU_DUPLICATE, OnModeNameDuplicate)
 
 		MESSAGE_HANDLER(WM_SYSCOMMAND, OnSysCommand)
 	END_MSG_MAP()
@@ -70,6 +72,8 @@ public:
 
         m_strAppName.LoadString(IDS_APP_NAME);
 
+        m_ModeListBox.SubclassWindow(GetDlgItem(IDC_LIST_MODES));
+
         InitLayout();
 
 		return TRUE;
@@ -80,6 +84,33 @@ public:
 		CloseDialog(wID);
 		return 0;
 	}
+    
+	LRESULT OnModeNameAdd(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+    {
+        CAddModeDlg dlg;
+        if(IDOK != dlg.DoModal())
+            return 0;
+
+        CString strModeName = dlg.GetModeName();
+        m_ModeListBox.AddString(strModeName);
+
+        return 0;
+    }
+    
+	LRESULT OnModeNameRemove(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+    {
+        return 0;
+    }
+    
+	LRESULT OnModeNameRename(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+    {
+        return 0;
+    }
+    
+	LRESULT OnModeNameDuplicate(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+    {
+        return 0;
+    }
 
 	void CloseDialog(int nVal)
 	{
@@ -111,4 +142,5 @@ public:
 private:
     CWndLayout      m_WndLayout;
     CString         m_strAppName;
+    CModeListBox    m_ModeListBox;
 };

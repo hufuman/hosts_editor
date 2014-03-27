@@ -26,6 +26,23 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Menu
+//
+
+IDR_MENU_MODE_NAME MENU
+BEGIN
+    POPUP "ModeNameContextMenu"
+    BEGIN
+        MENUITEM "&Add",                        ID_MODENAMECONTEXTMENU_ADD
+        MENUITEM "&Remove",                     ID_MODENAMECONTEXTMENU_REMOVE
+        MENUITEM "Re&name",                     ID_MODENAMECONTEXTMENU_RENAME
+        MENUITEM "&Duplicate",                  ID_MODENAMECONTEXTMENU_DUPLICATE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
@@ -73,6 +90,16 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
 
+IDD_ADDMODE_DLG DIALOGEX 0, 0, 262, 73
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Add Mode"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Mode Name:",IDC_STATIC,7,17,41,8
+    EDITTEXT        IDC_EDIT_NAME,51,14,204,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,205,52,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -96,6 +123,14 @@ BEGIN
         RIGHTMARGIN, 163
         TOPMARGIN, 7
         BOTTOMMARGIN, 55
+    END
+
+    IDD_ADDMODE_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 255
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 66
     END
 END
 #endif    // APSTUDIO_INVOKED

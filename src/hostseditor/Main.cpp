@@ -6,6 +6,12 @@
 
 
 #include "resource.h"
+#include "Config.h"
+#include "WndLayout.h"
+#include "LinkStatic.h"
+#include "AboutDlg.h"
+#include "ModeListBox.h"
+#include "AddModeDlg.h"
 #include "MainDlg.h"
 
 

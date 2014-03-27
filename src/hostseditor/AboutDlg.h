@@ -1,10 +1,6 @@
 #pragma once
 
 
-#include "LinkStatic.h"
-
-
-
 class CAboutDlg : public CDialogImpl<CAboutDlg>
 {
 public:

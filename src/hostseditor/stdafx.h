@@ -21,6 +21,9 @@
 
 #include <atlstr.h>
 #include <atlbase.h>
+#include <atlfile.h>
+#include <atlcoll.h>
+#include <atlwin.h>
 
 
 #include "..\WTL80\include\atlapp.h"
