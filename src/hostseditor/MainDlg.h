@@ -50,6 +50,8 @@ public:
 
         COMMAND_HANDLER(IDC_LIST_MODES, LBN_SELCHANGE, OnModeSelChanged)
         COMMAND_HANDLER(IDC_EDIT_HOSTS, EN_CHANGE, OnHostsChanged)
+
+        REFLECT_NOTIFICATIONS()
 	END_MSG_MAP()
 
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
@@ -173,10 +175,39 @@ public:
     }
     LRESULT OnEditApply(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
     {
+        int nCurSel = m_ModeListBox.GetCurSel();
+        if(nCurSel < 0)
+        {
+            MessageBox(_T("No Mode Selected"));
+            return 0;
+        }
+
+        DWORD dwItemData = m_ModeListBox.GetItemData(nCurSel);
+
+        CHosts hosts;
+        if(hosts.Apply(dwItemData))
+        {
+            m_ModeListBox.SetAppliedItemId(dwItemData);
+            MessageBox(_T("Apply Successfully"));
+        }
+        else
+        {
+            MessageBox(_T("Failed to Apply"));
+        }
         return 0;
     }
     LRESULT OnEditRestore(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
     {
+        CHosts hosts;
+        if(hosts.Restore())
+        {
+            m_ModeListBox.SetAppliedItemId(-1);
+            MessageBox(_T("Restore Successfully"));
+        }
+        else
+        {
+            MessageBox(_T("Failed to Restore"));
+        }
         return 0;
     }
     LRESULT OnHelpAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
@@ -230,6 +261,9 @@ public:
 
         SelectMode(0);
         SetModified(TRUE);
+
+        if(m_ModeListBox.GetAppliedItemId() == dwItemData)
+            m_ModeListBox.SetAppliedItemId(-1);
 
         return 0;
     }

@@ -31,6 +31,7 @@
 #include "..\WTL80\include\atlctrlx.h"
 #include "..\WTL80\include\atlwinx.h"
 #include "..\WTL80\include\atldlgs.h"
+#include "..\WTL80\include\atlframe.h"
 
 
 extern CAppModule _Module;

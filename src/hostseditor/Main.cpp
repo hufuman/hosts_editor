@@ -7,6 +7,7 @@
 
 #include "resource.h"
 #include "Util.h"
+#include "Hosts.h"
 #include "Config.h"
 #include "WndLayout.h"
 #include "LinkStatic.h"
