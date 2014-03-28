@@ -25,7 +25,7 @@ public:
         UINT uItem = this->ItemFromPoint(PtClient, bOutside);
         if(uItem < 0)
             uItem = 0;
-        if(uItem < this->GetCount())
+        if(uItem < static_cast<UINT>(this->GetCount()))
             this->SetCurSel(uItem);
 
         CMenu menu;

@@ -62,7 +62,7 @@
     <ClInclude Include="ModeListBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AddModeDlg.h">
+    <ClInclude Include="ModeNameDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

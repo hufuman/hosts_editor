@@ -40,6 +40,27 @@ BEGIN
     END
 END
 
+IDR_MENU_MAIN MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Load",                       ID_FILE_LOAD
+        MENUITEM "&Reload",                     ID_FILE_RELOAD
+        MENUITEM "&Save",                       ID_FILE_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Apply",                      ID_EDIT_APPLY
+        MENUITEM "&Restore",                    ID_EDIT_RESTORE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About",                      ID_HELP_ABOUT
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -71,12 +92,15 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 317, 194
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "HostsEditor"
+MENU IDR_MENU_MAIN
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "HOSTS Modes:",IDC_STATIC,7,7,48,8
-    LISTBOX         IDC_LIST_MODES,7,22,101,165,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_TABSTOP
-    EDITTEXT        IDC_EDIT_HOSTS,111,22,199,165,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
-    LTEXT           "HOSTS Content:",IDC_STATIC,111,7,54,8
+    LTEXT           "HOSTS Modes:",IDC_STATIC,7,25,48,8
+    LISTBOX         IDC_LIST_MODES,7,36,101,151,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_HOSTS,111,36,199,151,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "HOSTS Content:",IDC_STATIC,111,26,54,8
+    LTEXT           "Seperator:",IDC_STATIC,7,7,36,8
+    EDITTEXT        IDC_EDIT_SEPARATOR,57,7,253,14,ES_AUTOHSCROLL
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
@@ -90,7 +114,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_ADDMODE_DLG DIALOGEX 0, 0, 262, 73
+IDD_MODENAME_DLG DIALOGEX 0, 0, 262, 73
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Add Mode"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -125,7 +149,7 @@ BEGIN
         BOTTOMMARGIN, 55
     END
 
-    IDD_ADDMODE_DLG, DIALOG
+    IDD_MODENAME_DLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 255
@@ -143,7 +167,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_HOSTSEDITOR         ICON                    "HostsEditor.ico"
+IDR_MAINFRAME         ICON                    "HostsEditor.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

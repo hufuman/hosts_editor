@@ -1,13 +1,26 @@
 #pragma once
 
 
-struct stHostsMode
+struct stModeData
 {
+    DWORD   dwModeId;
     CString strName;
     CString strContent;
+
+    BOOL IsValid() const
+    {
+        return (dwModeId > 0 && strName.GetLength() > 0);
+    }
+
+    void Empty()
+    {
+        dwModeId = 0;
+        strName = _T("");
+        strContent = _T("");
+    }
 };
 
-typedef ATL::CAtlList<stHostsMode> HostsModes;
+typedef ATL::CAtlList<stModeData> HostsModes;
 
 class CConfig
 {
@@ -20,12 +33,23 @@ public:
     static CConfig& instance();
 
     BOOL Load(LPCTSTR szConfigPath);
-    BOOL Save(LPCTSTR szPath);
+    BOOL Save(LPCTSTR szConfigPath);
 
     BOOL IsNameExists(LPCTSTR szName) const;
-    void AddModeName(LPCTSTR szName);
+    void AddMode(const stModeData& data);
+
+    static BOOL IsValidModeName(LPCTSTR szName);
 
     HostsModes& GetHostsModes();
+    CString GetFilePath() const;
+
+    void SetSeparator(LPCTSTR szSeparator);
+    CString GetSeparator() const;
+
+    BOOL RenameMode(DWORD dwModeId, LPCTSTR szNewName);
+    BOOL RemoveById(DWORD dwModeId);
+
+    stModeData* GetModeById(DWORD dwModeId);
 
 private:
     void Clear();
@@ -36,6 +60,7 @@ private:
 
 private:
     CString     m_strConfigPath;
+    CString     m_strSeparator;
     HostsModes  m_HostsModes;
 };
 

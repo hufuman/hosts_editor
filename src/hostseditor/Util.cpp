@@ -54,7 +54,34 @@ namespace Util
 
 		DWORD dwWritten = 0;
 		BOOL bResult = ::WriteFile(hFile, pData, dwLength, &dwWritten, NULL) && (dwWritten == dwLength);
+        ::SetEndOfFile(hFile);
 		::CloseHandle(hFile);
 		return bResult;
 	}
+
+    namespace details
+    {
+        CString BrowseForFile(BOOL bOpen, HWND hWnd, LPCTSTR szFilter, LPCTSTR szDefExt)
+        {
+            CString strResult;
+            CFileDialog dlg(bOpen, 0, 0, OFN_NOCHANGEDIR | OFN_ENABLESIZING | OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_NODEREFERENCELINKS);
+            dlg.m_ofn.lpstrFilter = szFilter;
+            dlg.m_ofn.lpstrDefExt = szDefExt;
+            if(dlg.DoModal(hWnd) != IDOK)
+                return strResult;
+
+            strResult = dlg.m_szFileName;
+            return strResult;
+        }
+    }
+    
+    CString BrowseForSaveFile(HWND hWnd, LPCTSTR szFilter, LPCTSTR szDefExt)
+    {
+        return details::BrowseForFile(FALSE, hWnd, szFilter, szDefExt);
+    }
+
+    CString BrowseForOpenFile(HWND hWnd, LPCTSTR szFilter)
+    {
+        return details::BrowseForFile(TRUE, hWnd, szFilter, NULL);
+    }
 };
