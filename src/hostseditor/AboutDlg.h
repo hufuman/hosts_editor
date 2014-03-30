@@ -1,7 +1,7 @@
 #pragma once
 
 
-class CAboutDlg : public CDialogImpl<CAboutDlg>
+class CAboutDlg : public BaseDlg<CAboutDlg>
 {
 public:
 	enum { IDD = IDD_ABOUTBOX };

@@ -18,18 +18,20 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// Chinese (P.R.C.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 #pragma code_page(936)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_MENU_MODE_NAME MENU
+IDR_MENU_MODE_NAME MENU 
 BEGIN
     POPUP "ModeNameContextMenu"
     BEGIN
@@ -37,10 +39,11 @@ BEGIN
         MENUITEM "&Remove",                     ID_MODENAMECONTEXTMENU_REMOVE
         MENUITEM "Re&name",                     ID_MODENAMECONTEXTMENU_RENAME
         MENUITEM "&Duplicate",                  ID_MODENAMECONTEXTMENU_DUPLICATE
+        MENUITEM "A&pply",                      ID_EDIT_APPLY
     END
 END
 
-IDR_MENU_MAIN MENU
+IDR_MENU_MAIN MENU 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -67,40 +70,40 @@ END
 // String Table
 //
 
-STRINGTABLE
+STRINGTABLE 
 BEGIN
     IDS_ABOUTBOX            "About..."
     IDS_APP_NAME            "HostsEditor"
 END
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // Chinese (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 317, 194
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 409, 274
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "HostsEditor"
 MENU IDR_MENU_MAIN
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "HOSTS Modes:",IDC_STATIC,7,25,48,8
-    LISTBOX         IDC_LIST_MODES,7,36,101,151,LBS_SORT | LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_TABSTOP
-    EDITTEXT        IDC_EDIT_HOSTS,111,36,199,151,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
-    LTEXT           "HOSTS Content:",IDC_STATIC,111,26,54,8
-    LTEXT           "Seperator:",IDC_STATIC,7,7,36,8
-    EDITTEXT        IDC_EDIT_SEPARATOR,57,7,253,14,ES_AUTOHSCROLL
+    LTEXT           "HOSTS Modes:",IDC_STATIC,7,7,48,8
+    LISTBOX         IDC_LIST_MODES,7,18,101,249,LBS_SORT | LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_HOSTS,114,18,288,249,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "HOSTS Content:",IDC_STATIC,114,7,54,8
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
@@ -131,14 +134,14 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_DIALOG_MAIN, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 310
+        RIGHTMARGIN, 402
         TOPMARGIN, 7
-        BOTTOMMARGIN, 187
+        BOTTOMMARGIN, 267
     END
 
     IDD_ABOUTBOX, DIALOG
@@ -199,7 +202,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

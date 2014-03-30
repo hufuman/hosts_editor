@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="HostsEditor"
+	Name="hostseditor"
 	ProjectGUID="{FA9D399C-683D-4BB9-8F9E-308508EAC48E}"
 	RootNamespace="HostsEditor"
 	Keyword="Win32Proj"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -61,6 +61,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
+				UACExecutionLevel="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -114,7 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -133,6 +134,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
+				UACExecutionLevel="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -171,11 +173,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Main.cpp"
+				RelativePath=".\Config.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\PEResource.cpp"
+				RelativePath=".\Hosts.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Main.cpp"
 				>
 			</File>
 			<File
@@ -199,10 +205,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\SxSParser.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Util.cpp"
 				>
 			</File>
@@ -221,6 +223,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BaseDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Config.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hosts.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LinkStatic.h"
 				>
 			</File>
@@ -229,19 +243,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PEResource.h"
+				RelativePath=".\ModeData.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Resource.h"
+				RelativePath=".\ModeListBox.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ModeNameDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SxSParser.h"
 				>
 			</File>
 			<File

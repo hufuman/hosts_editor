@@ -4,10 +4,31 @@
 
 class CModeListBox : public CWindowImpl<CModeListBox, CListBox>, public COwnerDraw<CModeListBox>
 {
+    enum ItemStatus
+    {
+        ItemStatusNormalEven,
+        ItemStatusNormalOdd,
+        ItemStatusSelected,
+        ItemStatusApplied,
+        ItemStatusMax,
+    };
+
 public:
     CModeListBox()
     {
         m_dwAppliedItemId = -1;
+
+        m_brushBkg[ItemStatusNormalEven] = ::CreateSolidBrush(RGB(255, 255, 255));
+        m_clrText[ItemStatusNormalEven] = RGB(0, 0, 0);
+
+        m_brushBkg[ItemStatusNormalOdd] = ::CreateSolidBrush(RGB(243, 250, 255));
+        m_clrText[ItemStatusNormalOdd] = RGB(0, 0, 0);
+
+        m_brushBkg[ItemStatusSelected] = ::CreateSolidBrush(RGB(75, 169, 230));
+        m_clrText[ItemStatusSelected] = RGB(255, 255, 255);
+
+        m_brushBkg[ItemStatusApplied] = ::CreateSolidBrush(RGB(255, 127, 39));
+        m_clrText[ItemStatusApplied] = RGB(255, 255, 255);
     }
 
 	BEGIN_MSG_MAP(CModeListBox)
@@ -64,23 +85,12 @@ public:
         
         HDC hDC = lpDrawItemStruct->hDC;
         RECT& rcItem = lpDrawItemStruct->rcItem;
-        UINT itemState = lpDrawItemStruct->itemState;
 
-        BOOL bFocused = (itemState & ODS_FOCUS);
-        BOOL bSelected = (itemState & ODS_SELECTED);
+        DWORD dwBkMode = ::SetBkMode(hDC, TRANSPARENT);
 
-        DWORD dwTextColor = 0;
-        DWORD dwBkMode = 0;
-        if(bSelected)
-        {
-            ::FillRect(hDC, &rcItem, static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH)));
-            dwTextColor = ::SetTextColor(hDC, RGB(255, 255, 255));
-            dwBkMode = ::SetBkMode(hDC, TRANSPARENT);
-        }
-        else
-        {
-            ::FillRect(hDC, &rcItem, static_cast<HBRUSH>(::GetStockObject(WHITE_BRUSH)));
-        }
+        ItemStatus status = GetItemStatus(lpDrawItemStruct);
+        ::FillRect(hDC, &rcItem, m_brushBkg[status]);
+        DWORD dwTextColor = ::SetTextColor(hDC, m_clrText[status]);
 
         CString strData;
         this->GetText(lpDrawItemStruct->itemID, strData);
@@ -90,21 +100,34 @@ public:
             &lpDrawItemStruct->rcItem,
             DT_CENTER | DT_VCENTER | DT_END_ELLIPSIS | DT_SINGLELINE);
 
-        if(bFocused)
-        {
-            RECT rcFocus = lpDrawItemStruct->rcItem;
-            ::InflateRect(&rcFocus, -1, -1);
-            ::DrawFocusRect(hDC, &rcFocus);
-        }
+        ::SetTextColor(hDC, dwTextColor);
+        ::SetBkMode(hDC, dwBkMode);
+    }
 
-        if(bSelected)
+    ItemStatus GetItemStatus(LPDRAWITEMSTRUCT lpDrawItemStruct)
+    {
+        if(lpDrawItemStruct->itemData == m_dwAppliedItemId)
         {
-            ::SetTextColor(hDC, dwTextColor);
-            ::SetBkMode(hDC, dwBkMode);
+            return ItemStatusApplied;
+        }
+        else if(lpDrawItemStruct->itemState & ODS_SELECTED)
+        {
+            return ItemStatusSelected;
+        }
+        else if(lpDrawItemStruct->itemID % 2 == 0)
+        {
+            return ItemStatusNormalOdd;
+        }
+        else
+        {
+            return ItemStatusNormalEven;
         }
     }
 
 private:
-    DWORD m_dwAppliedItemId;
+    DWORD   m_dwAppliedItemId;
+
+    HBRUSH  m_brushBkg[ItemStatusMax];
+    DWORD   m_clrText[ItemStatusMax];
 };
 

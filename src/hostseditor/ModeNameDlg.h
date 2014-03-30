@@ -1,7 +1,7 @@
 #pragma once
 
 
-class CModeNameDlg : public CDialogImpl<CModeNameDlg>
+class CModeNameDlg : public BaseDlg<CModeNameDlg>
 {
 public:
 	enum { IDD = IDD_MODENAME_DLG };

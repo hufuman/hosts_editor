@@ -1,26 +1,7 @@
 #pragma once
 
 
-struct stModeData
-{
-    DWORD   dwModeId;
-    CString strName;
-    CString strContent;
-
-    BOOL IsValid() const
-    {
-        return (dwModeId > 0 && strName.GetLength() > 0);
-    }
-
-    void Empty()
-    {
-        dwModeId = 0;
-        strName = _T("");
-        strContent = _T("");
-    }
-};
-
-typedef ATL::CAtlList<stModeData> HostsModes;
+#include "ModeData.h"
 
 class CConfig
 {
@@ -43,9 +24,6 @@ public:
     HostsModes& GetHostsModes();
     CString GetFilePath() const;
 
-    void SetSeparator(LPCTSTR szSeparator);
-    CString GetSeparator() const;
-
     BOOL RenameMode(DWORD dwModeId, LPCTSTR szNewName);
     BOOL RemoveById(DWORD dwModeId);
 
@@ -60,7 +38,6 @@ private:
 
 private:
     CString     m_strConfigPath;
-    CString     m_strSeparator;
     HostsModes  m_HostsModes;
 };
 

@@ -4,13 +4,23 @@
 #include "stdafx.h"
 
 
+#ifdef ID_FILE_SAVE
+#undef ID_FILE_SAVE
+#endif
+
+#ifdef IDC_STATIC
+#undef IDC_STATIC
+#endif
+
 
 #include "resource.h"
+#include "ModeData.h"
 #include "Util.h"
 #include "Hosts.h"
 #include "Config.h"
 #include "WndLayout.h"
 #include "LinkStatic.h"
+#include "BaseDlg.h"
 #include "AboutDlg.h"
 #include "ModeListBox.h"
 #include "ModeNameDlg.h"
@@ -36,6 +46,9 @@ int Run(LPTSTR /*lpCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
     dlgMain.ShowWindow(nCmdShow);
 
     int nRet = theLoop.Run();
+
+    if(dlgMain.IsWindow())
+        dlgMain.DestroyWindow();
 
     _Module.RemoveMessageLoop();
     return nRet;

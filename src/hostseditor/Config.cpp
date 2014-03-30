@@ -3,10 +3,6 @@
 
 #include "Util.h"
 
-namespace
-{
-    TCHAR g_szSeparatorTag[] = _T("#--seperator--#");
-}
 
 CConfig::CConfig(void)
 {
@@ -36,8 +32,6 @@ BOOL CConfig::Load(LPCTSTR szConfigPath)
 
 	if(pData == NULL || dwLength == 0)
 		return TRUE;
-
-    m_strSeparator = _T("##########$$$$$$$$");
 
     LPBYTE pTrueData = (dwLength >= 2 && pData[0] == 0xFF && pData[1] == 0xFE)
         ? pData + 2 : pData;
@@ -114,16 +108,6 @@ CString CConfig::GetFilePath() const
     return m_strConfigPath;
 }
 
-void CConfig::SetSeparator(LPCTSTR szSeparator)
-{
-    m_strSeparator = szSeparator;
-}
-
-CString CConfig::GetSeparator() const
-{
-    return m_strSeparator;
-}
-
 BOOL CConfig::RenameMode(DWORD dwModeId, LPCTSTR szNewName)
 {
     stModeData* pData = GetModeById(dwModeId);
@@ -185,11 +169,7 @@ BOOL CConfig::ParseData(LPCVOID pData, DWORD dwLength)
 		if(strLine.GetLength() == 0)
 			continue;
 
-        if(strLine.Find(g_szSeparatorTag) == 0)
-        {
-            m_strSeparator = strLine.Mid(_tcslen(g_szSeparatorTag));
-        }
-		else if(strLine[0] == _T('['))
+        if(strLine[0] == _T('['))
 		{
             if(mode.IsValid())
             {
@@ -222,10 +202,6 @@ BOOL CConfig::ParseData(LPCVOID pData, DWORD dwLength)
 BOOL CConfig::PrepareData(LPBYTE& pData, DWORD& dwLength)
 {
 	CString strData;
-
-    strData += g_szSeparatorTag;
-    strData += m_strSeparator;
-    strData += _T("\r\n");
 
     CString strTemp;
 	POSITION posMode = m_HostsModes.GetHeadPosition();

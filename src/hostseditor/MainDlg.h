@@ -6,7 +6,7 @@
 #pragma once
 
 
-class CMainDlg : public CDialogImpl<CMainDlg>, public CMessageFilter
+class CMainDlg : public BaseDlg<CMainDlg>, public CMessageFilter
 {
 public:
 	enum { IDD = IDD_DIALOG_MAIN };
@@ -93,8 +93,6 @@ public:
 
         m_ModeListBox.SubclassWindow(GetDlgItem(IDC_LIST_MODES));
         m_EditModeContent.Attach(GetDlgItem(IDC_EDIT_HOSTS));
-
-        SetDlgItemText(IDC_EDIT_SEPARATOR, CConfig::instance().GetSeparator());
 
         InitLayout();
 
@@ -351,7 +349,6 @@ public:
     {
         m_WndLayout.Init(m_hWnd);
         m_WndLayout.AddControlById(IDC_LIST_MODES, Layout_VFill);
-        m_WndLayout.AddControlById(IDC_EDIT_SEPARATOR, Layout_HFill);
         m_WndLayout.AddControlById(IDC_EDIT_HOSTS, Layout_VFill | Layout_HFill);
     }
 
@@ -400,7 +397,6 @@ private:
         {
             SelectMode(0);
         }
-        SetDlgItemText(IDC_EDIT_SEPARATOR, CConfig::instance().GetSeparator());
     }
 
     BOOL SaveConfig(BOOL bPrompt, BOOL bForce)
@@ -431,9 +427,6 @@ private:
                 return FALSE;
         }
 
-        CString strSeparator;
-        GetDlgItemText(IDC_EDIT_SEPARATOR, strSeparator);
-        CConfig::instance().SetSeparator(strSeparator);
         CConfig::instance().Save(strFilePath);
         SetModified(FALSE);
         return TRUE;
