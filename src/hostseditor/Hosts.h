@@ -1,7 +1,7 @@
 #pragma once
 
 
-
+#include "ModeData.h"
 
 class CHosts
 {
@@ -10,7 +10,7 @@ public:
     CHosts(void);
     ~CHosts(void);
 
-    BOOL Apply(DWORD dwModeId);
+    BOOL Apply(stModeData* pModeData);
     BOOL Restore();
 
 private:

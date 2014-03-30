@@ -3,6 +3,8 @@
 
 #include "ModeData.h"
 
+typedef CAtlList<CString> FilePathList;
+
 class CConfig
 {
     CConfig(void);
@@ -29,15 +31,21 @@ public:
 
     stModeData* GetModeById(DWORD dwModeId);
 
+    const FilePathList& GetFileHistoryList() const;
+
+    // return whether files history changed
+    BOOL AddFile(LPCTSTR szFile);
+
 private:
     void Clear();
 
-private:
     BOOL ParseData(LPCVOID pData, DWORD dwLength);
     BOOL PrepareData(LPBYTE& pData, DWORD& dwLength);
 
 private:
     CString     m_strConfigPath;
     HostsModes  m_HostsModes;
+
+    FilePathList    m_FilePathList;
 };
 

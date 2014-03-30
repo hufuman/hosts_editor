@@ -12,4 +12,8 @@ namespace Util
     
     CString BrowseForSaveFile(HWND hWnd, LPCTSTR szFilter, LPCTSTR szDefExt);
     CString BrowseForOpenFile(HWND hWnd, LPCTSTR szFilter);
+
+    void MakeWindowVisible(HWND hWnd);
+
+    BOOL FilterWindowMessage(UINT message, DWORD dwValue);
 };

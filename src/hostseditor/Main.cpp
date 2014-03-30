@@ -43,6 +43,9 @@ int Run(LPTSTR /*lpCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
         return 0;
     }
 
+    Util::FilterWindowMessage(0x0049 /*WM_COPYGLOBALDATA*/, 1);
+    Util::FilterWindowMessage(WM_DROPFILES, 1);
+
     dlgMain.ShowWindow(nCmdShow);
 
     int nRet = theLoop.Run();
@@ -64,6 +67,14 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #else
     ::InitCommonControls();
 #endif
+
+    // Find Existed Instance
+    HWND hWnd = ::FindWindow(_T("#32770"), _T("HostsEditor"));
+    if(hWnd != NULL)
+    {
+        Util::MakeWindowVisible(hWnd);
+        return 0;
+    }
 
     _Module.Init(NULL, hInstance);
 

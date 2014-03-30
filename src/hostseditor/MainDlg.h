@@ -17,7 +17,7 @@ public:
         m_bModified = FALSE;
         m_nLastSelIndex = -1;
         m_bHostsChanged = FALSE;
-	}
+    }
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg)
 	{
@@ -27,9 +27,10 @@ public:
 	BEGIN_MSG_MAP(CMainDlg)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
         MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
-		MESSAGE_HANDLER(WM_SYSCOMMAND, OnSysCommand)
+        MESSAGE_HANDLER(WM_SYSCOMMAND, OnSysCommand)
+        MESSAGE_HANDLER(WM_DROPFILES, OnDropFiles)
 
-		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
+        MESSAGE_HANDLER(WM_CLOSE, OnClose)
 
         // Modes Name ListBox
 		COMMAND_ID_HANDLER(ID_MODENAMECONTEXTMENU_ADD, OnModeNameAdd)
@@ -95,6 +96,9 @@ public:
         m_EditModeContent.Attach(GetDlgItem(IDC_EDIT_HOSTS));
 
         InitLayout();
+        LoadFileHistory();
+
+        ::DragAcceptFiles(m_hWnd, TRUE);
 
 		return TRUE;
 	}
@@ -104,12 +108,27 @@ public:
         m_ModeListBox.UnsubclassWindow(FALSE);
         m_EditModeContent.Detach();
 
+        ::PostQuitMessage(0);
         return 0;
     }
 
-	LRESULT OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-	{
-		CloseDialog(wID);
+    void CloseDialog()
+    {
+        if(!IsModified())
+        {
+            DestroyWindow();
+            return;
+        }
+
+        int nResult = MsgBox(_T("Content modified, are you sure to exit without saving ?"), MB_OKCANCEL | MB_ICONQUESTION);
+        if(IDOK == nResult)
+            DestroyWindow();
+    }
+
+    LRESULT OnClose(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled)
+    {
+        if(SaveConfig(TRUE, FALSE))
+            DestroyWindow();
 		return 0;
 	}
 
@@ -123,8 +142,10 @@ public:
         if(strFilePath.GetLength() <= 0)
             return 0;
 
-        LoadConfig(strFilePath);
-
+        if(LoadConfig(strFilePath))
+        {
+            AddFileHistory(strFilePath);
+        }
         return 0;
     }
     LRESULT OnFileReload(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
@@ -132,14 +153,13 @@ public:
         CString strFilePath = CConfig::instance().GetFilePath();
         if(strFilePath.GetLength() == 0)
         {
-            MessageBox(_T("Haven't load config yet."));
+            MsgBox(_T("Haven't load config yet."), MB_OK | MB_ICONWARNING);
             return 0;
         }
 
         if(IsModified())
         {
-            int nResult = MessageBox(_T("Hosts changed, do you want to reload without saving?"),
-                _T(""),
+            int nResult = MsgBox(_T("Hosts changed, do you want to reload without saving?"),
                 MB_YESNOCANCEL | MB_ICONQUESTION);
             if(nResult == IDYES)
             {
@@ -162,13 +182,17 @@ public:
     LRESULT OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
     {
         SaveConfig(FALSE, TRUE);
+
+        AddFileHistory(CConfig::instance().GetFilePath());
+
         return 0;
     }
     LRESULT OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
     {
         if(!SaveConfig(TRUE, FALSE))
             return 0;
-        ::PostQuitMessage(0);
+
+        CloseDialog();
         return 0;
     }
     LRESULT OnEditApply(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
@@ -176,21 +200,22 @@ public:
         int nCurSel = m_ModeListBox.GetCurSel();
         if(nCurSel < 0)
         {
-            MessageBox(_T("No Mode Selected"));
+            MsgBox(_T("No Mode Selected"), MB_OK | MB_ICONWARNING);
             return 0;
         }
 
         DWORD dwItemData = m_ModeListBox.GetItemData(nCurSel);
+        stModeData* pData = CConfig::instance().GetModeById(dwItemData);
 
         CHosts hosts;
-        if(hosts.Apply(dwItemData))
+        if(hosts.Apply(pData))
         {
             m_ModeListBox.SetAppliedItemId(dwItemData);
-            MessageBox(_T("Apply Successfully"));
+            MsgBox(_T("Apply Successfully"), MB_OK | MB_ICONINFORMATION);
         }
         else
         {
-            MessageBox(_T("Failed to Apply"));
+            MsgBox(_T("Failed to Apply"), MB_OK | MB_ICONWARNING);
         }
         return 0;
     }
@@ -200,11 +225,11 @@ public:
         if(hosts.Restore())
         {
             m_ModeListBox.SetAppliedItemId(-1);
-            MessageBox(_T("Restore Successfully"));
+            MsgBox(_T("Restore Successfully"), MB_OK | MB_ICONINFORMATION);
         }
         else
         {
-            MessageBox(_T("Failed to Restore"));
+            MsgBox(_T("Failed to Restore"), MB_OK | MB_ICONWARNING);
         }
         return 0;
     }
@@ -323,26 +348,43 @@ public:
         return 0;
     }
 
-	void CloseDialog(int nVal)
-	{
-		DestroyWindow();
-		::PostQuitMessage(nVal);
-	}
+    LRESULT OnSysCommand(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
+    {
+        UINT uCmdType = (UINT)wParam;
 
-	LRESULT OnSysCommand(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
-	{
-		UINT uCmdType = (UINT)wParam;
+        if((uCmdType & 0xFFF0) == IDM_ABOUTBOX)
+        {
+            CAboutDlg dlg;
+            dlg.DoModal();
+        }
+        else
+        {
+            bHandled = FALSE;
+        }
 
-		if((uCmdType & 0xFFF0) == IDM_ABOUTBOX)
-		{
-			CAboutDlg dlg;
-			dlg.DoModal();
-		}
-		else
-			bHandled = FALSE;
+        return 0;
+    }
 
-		return 0;
-	}
+    LRESULT OnDropFiles(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
+    {
+        HDROP hDrop = reinterpret_cast<HDROP>(wParam);
+
+        TCHAR szFilePath[MAX_PATH * 2] = {0};
+        if(::DragQueryFile(hDrop, 0, szFilePath, MAX_PATH) == 0)
+        {
+            return 0;
+        }
+
+        if(!SaveConfig(TRUE, IsModified()))
+            return 0;
+
+        if(LoadConfig(szFilePath))
+        {
+            AddFileHistory(szFilePath);
+        }
+
+        return 0;
+    }
 
     // Layout
     void InitLayout()
@@ -371,7 +413,7 @@ private:
         BOOL bResult = CConfig::instance().Load(szFilePath);
         if(!bResult)
         {
-            MessageBox(_T("Failed to load config"));
+            MsgBox(_T("Failed to load config"), MB_OK | MB_ICONWARNING);
             return FALSE;
         }
         
@@ -408,7 +450,7 @@ private:
 
         if(bPrompt)
         {
-            int nResult = MessageBox(_T("Modes changed, do you want to save modes information?"), _T(""), MB_YESNOCANCEL | MB_ICONQUESTION);
+            int nResult = MsgBox(_T("Modes changed, do you want to save modes information?"), MB_YESNOCANCEL | MB_ICONQUESTION);
             if(nResult == IDCANCEL)
                 return FALSE;
 
@@ -463,6 +505,7 @@ private:
         else
             nIndex = m_ModeListBox.InsertString(nIndex, data.strName);
         m_ModeListBox.SetItemData(nIndex, data.dwModeId);
+        SetModified(TRUE);
         return nIndex;
     }
 
@@ -499,6 +542,64 @@ private:
             m_EditModeContent.SetWindowText(pData->strContent);
         else
             m_EditModeContent.SetWindowText(_T(""));
+    }
+
+    CMenuHandle GetRecentMenu()
+    {
+        CMenuHandle mainMenu = GetMenu();
+        CMenuHandle fileMenu = mainMenu.GetSubMenu(0);
+        int nCount = fileMenu.GetMenuItemCount();
+
+        MENUITEMINFO info = {sizeof(info), MIIM_SUBMENU};
+        for(int i=0; i<nCount; ++ i)
+        {
+            UINT uId = fileMenu.GetMenuItemID(i);
+            if(uId == -1)
+            {
+                fileMenu.GetMenuItemInfo(i, TRUE, &info);
+                if(info.hSubMenu != NULL)
+                {
+                    return info.hSubMenu;
+                }
+            }
+        }
+        return NULL;
+    }
+
+    void LoadFileHistory()
+    {
+        const FilePathList& fileList = CConfig::instance().GetFileHistoryList();
+        if(fileList.GetCount() == 0)
+            return;
+
+        // Find Exit
+        CMenuHandle recentMenu = GetRecentMenu();
+        if(recentMenu == NULL)
+            return;
+
+        int nCount = recentMenu.GetMenuItemCount();
+        for(int i=0; i<nCount; ++ i)
+        {
+            recentMenu.DeleteMenu(0, MF_BYPOSITION);
+        }
+
+        CString strTemp;
+        POSITION pos = fileList.GetHeadPosition();
+        while(pos != NULL)
+        {
+            CString strFilePath = fileList.GetNext(pos);
+            strTemp = _T("&1. ");
+            strTemp += strFilePath;
+            recentMenu.AppendMenu(MF_STRING, static_cast<UINT_PTR>(0), strTemp);
+        }
+    }
+
+    void AddFileHistory(LPCTSTR szFilePath)
+    {
+        if(CConfig::instance().AddFile(szFilePath))
+        {
+            LoadFileHistory();
+        }
     }
 
 private:

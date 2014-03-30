@@ -35,13 +35,13 @@ public:
         GetDlgItemText(IDC_EDIT_NAME, m_strModeName);
         if(m_strModeName.GetLength() == 0)
         {
-            MessageBox(_T("Mode Name Can't be Empty"));
+            MsgBox(_T("Mode Name Can't be Empty"), MB_OK | MB_ICONWARNING);
             return 0;
         }
 
         if(!CConfig::IsValidModeName(m_strModeName))
         {
-            MessageBox(_T("Mode name can contain only letters (a-z), numbers, and periods"));
+            MsgBox(_T("Mode name can contain only letters (a-z), numbers, and periods"), MB_OK | MB_ICONWARNING);
             return 0;
         }
 
@@ -50,7 +50,7 @@ public:
             // Add New Mode
             if(CConfig::instance().IsNameExists(m_strModeName))
             {
-                MessageBox(_T("Mode Name Already Exists"));
+                MsgBox(_T("Mode Name Already Exists"), MB_OK | MB_ICONWARNING);
                 return 0;
             }
 

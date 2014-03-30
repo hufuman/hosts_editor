@@ -195,4 +195,33 @@ namespace Util
     {
         return details::BrowseForFile(TRUE, hWnd, szFilter, NULL);
     }
+
+    void MakeWindowVisible(HWND hWnd)
+    {
+        if(hWnd == NULL)
+            return;
+
+        if(::IsIconic(hWnd) || ::GetForegroundWindow() != hWnd)
+            ::SwitchToThisWindow(hWnd, TRUE);
+        else
+            ::ShowWindow(hWnd, SW_SHOW);
+    }
+
+    BOOL FilterWindowMessage(UINT message, DWORD dwValue)
+    {
+        // 添加消息过滤，允许接受低级别的Explorer发送WM_TASKBARCREATED消息
+        typedef BOOL (WINAPI FAR *ChangeWindowMessageFilter_PROC)(UINT,DWORD);
+        ChangeWindowMessageFilter_PROC pfnChangeWindowMessageFilter;
+        pfnChangeWindowMessageFilter = (ChangeWindowMessageFilter_PROC)::GetProcAddress (::GetModuleHandle(_T("USER32")), "ChangeWindowMessageFilter");
+        BOOL bResult = FALSE;
+        if(pfnChangeWindowMessageFilter != NULL)
+        {
+            bResult = pfnChangeWindowMessageFilter(message, dwValue);
+        }
+        else
+        {
+            bResult = TRUE;
+        }
+        return bResult;
+    }
 };

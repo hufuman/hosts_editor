@@ -18,12 +18,8 @@ CHosts::~CHosts(void)
 {
 }
 
-BOOL CHosts::Apply(DWORD dwModeId)
+BOOL CHosts::Apply(stModeData* pModeData)
 {
-    stModeData* pModeData = CConfig::instance().GetModeById(dwModeId);
-    if(pModeData == NULL)
-        return FALSE;
-
     CString strData;
     if(!GetFilteredHosts(strData))
         return FALSE;

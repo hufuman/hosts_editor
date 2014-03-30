@@ -21,7 +21,6 @@ CConfig& CConfig::instance()
 
 BOOL CConfig::Load(LPCTSTR szConfigPath)
 {
-	m_strConfigPath = szConfigPath;
 	Clear();
 
 	LPBYTE pData = NULL;
@@ -37,6 +36,10 @@ BOOL CConfig::Load(LPCTSTR szConfigPath)
         ? pData + 2 : pData;
 	BOOL bResult = ParseData(pTrueData, dwLength);
 	free(pData);
+    if(bResult)
+    {
+        m_strConfigPath = szConfigPath;
+    }
 	return bResult;
 }
 
@@ -150,6 +153,7 @@ stModeData* CConfig::GetModeById(DWORD dwModeId)
 
 void CConfig::Clear()
 {
+    m_strConfigPath = _T("");
 	m_HostsModes.RemoveAll();
 }
 
@@ -228,4 +232,42 @@ BOOL CConfig::PrepareData(LPBYTE& pData, DWORD& dwLength)
 
 	memcpy(pData, (LPCTSTR)strData, dwLength);
 	return TRUE;
+}
+
+const FilePathList& CConfig::GetFileHistoryList() const
+{
+    return m_FilePathList;
+}
+
+BOOL CConfig::AddFile(LPCTSTR szFile)
+{
+    BOOL bFound = FALSE;
+    POSITION pos = NULL;
+    POSITION lastPos = NULL;
+    if(m_FilePathList.GetCount() > 0)
+    {
+        int nIndex = 0;
+        pos = m_FilePathList.GetHeadPosition();
+        while(pos != NULL)
+        {
+            lastPos = pos;
+            CString strFilePath = m_FilePathList.GetNext(pos);
+            if(strFilePath.CompareNoCase(szFile) == 0)
+            {
+                bFound = TRUE;
+                break;
+            }
+            ++ nIndex;
+        }
+        BOOL bAtHead = (nIndex == 0 && bFound);
+        if(bAtHead)
+            return FALSE;
+    }
+
+    if(bFound)
+    {
+        m_FilePathList.RemoveAt(lastPos);
+    }
+    m_FilePathList.AddHead(szFile);
+    return TRUE;
 }
