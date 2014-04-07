@@ -22,9 +22,7 @@
 #define ID_MODENAMECONTEXTMENU_DUPLICATE 32775
 #define ID_FILE_LOAD                    32776
 #define ID_FILE_EXIT                    32779
-#define ID_FILE_SAVE                    32780
 #define ID_HELP_ABOUT                   32781
-#define ID_FILE_RELOAD                  32782
 #define ID_FILE_APPLY                   32783
 #define ID_EDIT_APPLY                   32784
 #define ID_EDIT_RESTORE                 32785

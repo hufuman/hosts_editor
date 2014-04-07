@@ -43,9 +43,6 @@ int Run(LPTSTR /*lpCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
         return 0;
     }
 
-    Util::FilterWindowMessage(0x0049 /*WM_COPYGLOBALDATA*/, 1);
-    Util::FilterWindowMessage(WM_DROPFILES, 1);
-
     dlgMain.ShowWindow(nCmdShow);
 
     int nRet = theLoop.Run();

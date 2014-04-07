@@ -47,10 +47,6 @@ IDR_MENU_MAIN MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&Load",                       ID_FILE_LOAD
-        MENUITEM "&Reload",                     ID_FILE_RELOAD
-        MENUITEM "&Save",                       ID_FILE_SAVE
-        MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_FILE_EXIT
     END
     POPUP "&Edit"

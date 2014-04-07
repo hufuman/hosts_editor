@@ -6,6 +6,10 @@
 
 CConfig::CConfig(void)
 {
+    TCHAR szCfgPath[MAX_PATH];
+    ::GetModuleFileName(NULL, szCfgPath, MAX_PATH);
+    _tcsncat(szCfgPath, _T(".cfg"), MAX_PATH);
+    m_strConfigPath = szCfgPath;
 }
 
 CConfig::~CConfig(void)
@@ -19,14 +23,14 @@ CConfig& CConfig::instance()
     return inst;
 }
 
-BOOL CConfig::Load(LPCTSTR szConfigPath)
+BOOL CConfig::Load()
 {
 	Clear();
 
 	LPBYTE pData = NULL;
 	DWORD dwLength = 0;
 
-	if(!Util::ReadFile(szConfigPath, pData, dwLength))
+	if(!Util::ReadFile(m_strConfigPath, pData, dwLength))
 		return FALSE;
 
 	if(pData == NULL || dwLength == 0)
@@ -36,25 +40,18 @@ BOOL CConfig::Load(LPCTSTR szConfigPath)
         ? pData + 2 : pData;
 	BOOL bResult = ParseData(pTrueData, dwLength);
 	free(pData);
-    if(bResult)
-    {
-        m_strConfigPath = szConfigPath;
-    }
 	return bResult;
 }
 
-BOOL CConfig::Save(LPCTSTR szConfigPath)
+BOOL CConfig::Save()
 {
 	LPBYTE pData = NULL;
 	DWORD dwLength = 0;
 	if(!PrepareData(pData, dwLength))
 		return FALSE;
 
-	BOOL bResult = Util::WriteFile(szConfigPath, pData, dwLength);
+	BOOL bResult = Util::WriteFile(m_strConfigPath, pData, dwLength);
 	free(pData);
-
-    if(bResult)
-	    m_strConfigPath = szConfigPath;
 
 	return bResult;
 }
@@ -106,9 +103,9 @@ HostsModes& CConfig::GetHostsModes()
 	return m_HostsModes;
 }
 
-CString CConfig::GetFilePath() const
+BOOL CConfig::IsConfigExists() const
 {
-    return m_strConfigPath;
+    return Util::IsFileExists(m_strConfigPath);
 }
 
 BOOL CConfig::RenameMode(DWORD dwModeId, LPCTSTR szNewName)
@@ -153,7 +150,6 @@ stModeData* CConfig::GetModeById(DWORD dwModeId)
 
 void CConfig::Clear()
 {
-    m_strConfigPath = _T("");
 	m_HostsModes.RemoveAll();
 }
 
@@ -234,40 +230,3 @@ BOOL CConfig::PrepareData(LPBYTE& pData, DWORD& dwLength)
 	return TRUE;
 }
 
-const FilePathList& CConfig::GetFileHistoryList() const
-{
-    return m_FilePathList;
-}
-
-BOOL CConfig::AddFile(LPCTSTR szFile)
-{
-    BOOL bFound = FALSE;
-    POSITION pos = NULL;
-    POSITION lastPos = NULL;
-    if(m_FilePathList.GetCount() > 0)
-    {
-        int nIndex = 0;
-        pos = m_FilePathList.GetHeadPosition();
-        while(pos != NULL)
-        {
-            lastPos = pos;
-            CString strFilePath = m_FilePathList.GetNext(pos);
-            if(strFilePath.CompareNoCase(szFile) == 0)
-            {
-                bFound = TRUE;
-                break;
-            }
-            ++ nIndex;
-        }
-        BOOL bAtHead = (nIndex == 0 && bFound);
-        if(bAtHead)
-            return FALSE;
-    }
-
-    if(bFound)
-    {
-        m_FilePathList.RemoveAt(lastPos);
-    }
-    m_FilePathList.AddHead(szFile);
-    return TRUE;
-}

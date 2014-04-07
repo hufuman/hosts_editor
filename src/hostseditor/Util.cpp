@@ -170,32 +170,6 @@ namespace Util
         return bResult;
     }
 
-    namespace details
-    {
-        CString BrowseForFile(BOOL bOpen, HWND hWnd, LPCTSTR szFilter, LPCTSTR szDefExt)
-        {
-            CString strResult;
-            CFileDialog dlg(bOpen, 0, 0, OFN_NOCHANGEDIR | OFN_ENABLESIZING | OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_NODEREFERENCELINKS);
-            dlg.m_ofn.lpstrFilter = szFilter;
-            dlg.m_ofn.lpstrDefExt = szDefExt;
-            if(dlg.DoModal(hWnd) != IDOK)
-                return strResult;
-
-            strResult = dlg.m_szFileName;
-            return strResult;
-        }
-    }
-    
-    CString BrowseForSaveFile(HWND hWnd, LPCTSTR szFilter, LPCTSTR szDefExt)
-    {
-        return details::BrowseForFile(FALSE, hWnd, szFilter, szDefExt);
-    }
-
-    CString BrowseForOpenFile(HWND hWnd, LPCTSTR szFilter)
-    {
-        return details::BrowseForFile(TRUE, hWnd, szFilter, NULL);
-    }
-
     void MakeWindowVisible(HWND hWnd)
     {
         if(hWnd == NULL)
@@ -207,21 +181,10 @@ namespace Util
             ::ShowWindow(hWnd, SW_SHOW);
     }
 
-    BOOL FilterWindowMessage(UINT message, DWORD dwValue)
+    BOOL IsFileExists(LPCTSTR szFilePath)
     {
-        // 添加消息过滤，允许接受低级别的Explorer发送WM_TASKBARCREATED消息
-        typedef BOOL (WINAPI FAR *ChangeWindowMessageFilter_PROC)(UINT,DWORD);
-        ChangeWindowMessageFilter_PROC pfnChangeWindowMessageFilter;
-        pfnChangeWindowMessageFilter = (ChangeWindowMessageFilter_PROC)::GetProcAddress (::GetModuleHandle(_T("USER32")), "ChangeWindowMessageFilter");
-        BOOL bResult = FALSE;
-        if(pfnChangeWindowMessageFilter != NULL)
-        {
-            bResult = pfnChangeWindowMessageFilter(message, dwValue);
-        }
-        else
-        {
-            bResult = TRUE;
-        }
-        return bResult;
+        DWORD dwAttr = ::GetFileAttributes(szFilePath);
+        return ((dwAttr != INVALID_FILE_ATTRIBUTES)
+            && (dwAttr & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY);
     }
 };

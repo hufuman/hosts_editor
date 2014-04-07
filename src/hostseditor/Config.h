@@ -3,7 +3,7 @@
 
 #include "ModeData.h"
 
-typedef CAtlList<CString> FilePathList;
+
 
 class CConfig
 {
@@ -15,8 +15,8 @@ public:
 
     static CConfig& instance();
 
-    BOOL Load(LPCTSTR szConfigPath);
-    BOOL Save(LPCTSTR szConfigPath);
+    BOOL Load();
+    BOOL Save();
 
     BOOL IsNameExists(LPCTSTR szName) const;
     void AddMode(const stModeData& data);
@@ -24,17 +24,12 @@ public:
     static BOOL IsValidModeName(LPCTSTR szName);
 
     HostsModes& GetHostsModes();
-    CString GetFilePath() const;
+    BOOL IsConfigExists() const;
 
     BOOL RenameMode(DWORD dwModeId, LPCTSTR szNewName);
     BOOL RemoveById(DWORD dwModeId);
 
     stModeData* GetModeById(DWORD dwModeId);
-
-    const FilePathList& GetFileHistoryList() const;
-
-    // return whether files history changed
-    BOOL AddFile(LPCTSTR szFile);
 
 private:
     void Clear();
@@ -45,7 +40,5 @@ private:
 private:
     CString     m_strConfigPath;
     HostsModes  m_HostsModes;
-
-    FilePathList    m_FilePathList;
 };
 

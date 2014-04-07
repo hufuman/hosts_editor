@@ -28,7 +28,6 @@ public:
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
         MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
         MESSAGE_HANDLER(WM_SYSCOMMAND, OnSysCommand)
-        MESSAGE_HANDLER(WM_DROPFILES, OnDropFiles)
 
         MESSAGE_HANDLER(WM_CLOSE, OnClose)
 
@@ -39,9 +38,6 @@ public:
 		COMMAND_ID_HANDLER(ID_MODENAMECONTEXTMENU_DUPLICATE, OnModeNameDuplicate)
 
         // Main Menu
-        COMMAND_ID_HANDLER(ID_FILE_LOAD, OnFileLoad)
-        COMMAND_ID_HANDLER(ID_FILE_RELOAD, OnFileReload)
-        COMMAND_ID_HANDLER(ID_FILE_SAVE, OnFileSave)
         COMMAND_ID_HANDLER(ID_FILE_EXIT, OnFileExit)
 
         COMMAND_ID_HANDLER(ID_EDIT_APPLY, OnEditApply)
@@ -96,9 +92,10 @@ public:
         m_EditModeContent.Attach(GetDlgItem(IDC_EDIT_HOSTS));
 
         InitLayout();
-        LoadFileHistory();
 
-        ::DragAcceptFiles(m_hWnd, TRUE);
+        ::DragAcceptFiles(m_hWnd, FALSE);
+
+        LoadConfig();
 
 		return TRUE;
 	}
@@ -132,61 +129,6 @@ public:
 		return 0;
 	}
 
-    // MainMenu
-    LRESULT OnFileLoad(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-    {
-        if(!SaveConfig(TRUE, IsModified()))
-            return 0;
-
-        CString strFilePath = Util::BrowseForOpenFile(m_hWnd, _T("Config File\0*.config\0All Files\0*.*\0\0"));
-        if(strFilePath.GetLength() <= 0)
-            return 0;
-
-        if(LoadConfig(strFilePath))
-        {
-            AddFileHistory(strFilePath);
-        }
-        return 0;
-    }
-    LRESULT OnFileReload(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-    {
-        CString strFilePath = CConfig::instance().GetFilePath();
-        if(strFilePath.GetLength() == 0)
-        {
-            MsgBox(_T("Haven't load config yet."), MB_OK | MB_ICONWARNING);
-            return 0;
-        }
-
-        if(IsModified())
-        {
-            int nResult = MsgBox(_T("Hosts changed, do you want to reload without saving?"),
-                MB_YESNOCANCEL | MB_ICONQUESTION);
-            if(nResult == IDYES)
-            {
-                if(!SaveConfig(FALSE, FALSE))
-                    return 0;
-            }
-            else if(nResult == IDNO)
-            {
-            }
-            else if(nResult == IDCANCEL)
-            {
-                return 0;
-            }
-        }
-
-        LoadConfig(strFilePath);
-
-        return 0;
-    }
-    LRESULT OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-    {
-        SaveConfig(FALSE, TRUE);
-
-        AddFileHistory(CConfig::instance().GetFilePath());
-
-        return 0;
-    }
     LRESULT OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
     {
         if(!SaveConfig(TRUE, FALSE))
@@ -365,27 +307,6 @@ public:
         return 0;
     }
 
-    LRESULT OnDropFiles(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
-    {
-        HDROP hDrop = reinterpret_cast<HDROP>(wParam);
-
-        TCHAR szFilePath[MAX_PATH * 2] = {0};
-        if(::DragQueryFile(hDrop, 0, szFilePath, MAX_PATH) == 0)
-        {
-            return 0;
-        }
-
-        if(!SaveConfig(TRUE, IsModified()))
-            return 0;
-
-        if(LoadConfig(szFilePath))
-        {
-            AddFileHistory(szFilePath);
-        }
-
-        return 0;
-    }
-
     // Layout
     void InitLayout()
     {
@@ -405,12 +326,15 @@ private:
         return m_bModified;
     }
 
-    BOOL LoadConfig(LPCTSTR szFilePath)
+    BOOL LoadConfig()
     {
+        if(!CConfig::instance().IsConfigExists())
+            return TRUE;
+
         m_ModeListBox.ResetContent();
         m_EditModeContent.SetWindowText(_T(""));
 
-        BOOL bResult = CConfig::instance().Load(szFilePath);
+        BOOL bResult = CConfig::instance().Load();
         if(!bResult)
         {
             MsgBox(_T("Failed to load config"), MB_OK | MB_ICONWARNING);
@@ -461,15 +385,7 @@ private:
             }
         }
 
-        CString strFilePath = CConfig::instance().GetFilePath();
-        if(strFilePath.GetLength() == 0)
-        {
-            strFilePath = Util::BrowseForSaveFile(m_hWnd, _T("Config File\0*.config\0All Files\0*.*\0\0"), _T("*.config"));
-            if(strFilePath.GetLength() == 0)
-                return FALSE;
-        }
-
-        CConfig::instance().Save(strFilePath);
+        CConfig::instance().Save();
         SetModified(FALSE);
         return TRUE;
     }
@@ -564,42 +480,6 @@ private:
             }
         }
         return NULL;
-    }
-
-    void LoadFileHistory()
-    {
-        const FilePathList& fileList = CConfig::instance().GetFileHistoryList();
-        if(fileList.GetCount() == 0)
-            return;
-
-        // Find Exit
-        CMenuHandle recentMenu = GetRecentMenu();
-        if(recentMenu == NULL)
-            return;
-
-        int nCount = recentMenu.GetMenuItemCount();
-        for(int i=0; i<nCount; ++ i)
-        {
-            recentMenu.DeleteMenu(0, MF_BYPOSITION);
-        }
-
-        CString strTemp;
-        POSITION pos = fileList.GetHeadPosition();
-        while(pos != NULL)
-        {
-            CString strFilePath = fileList.GetNext(pos);
-            strTemp = _T("&1. ");
-            strTemp += strFilePath;
-            recentMenu.AppendMenu(MF_STRING, static_cast<UINT_PTR>(0), strTemp);
-        }
-    }
-
-    void AddFileHistory(LPCTSTR szFilePath)
-    {
-        if(CConfig::instance().AddFile(szFilePath))
-        {
-            LoadFileHistory();
-        }
     }
 
 private:
